@@ -7,8 +7,6 @@ then this Python program is for you.
 It features a complete state machine, bonus scheme and special rules of a commercial slotmachine.
 Well actually I modified the rules in order to get a better payout rate :-] 
 
-I wrote this simulation after I quit my job in the casino games industry back in 2005.
-
 It features various parameter options, even support for macros, see comments in source code.
 
 
