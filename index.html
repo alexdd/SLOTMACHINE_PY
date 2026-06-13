@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Slot Machine Simulation</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <div class="machine">
+
+    <header class="machine-header">
+
+      <h1>Slot Machine</h1>
+
+      <p class="branch-link">
+        <a href="https://github.com/alexdd/SLOTMACHINE_PY/tree/html5-ui" target="_blank" rel="noopener noreferrer">GitHub branch: html5-ui</a>
+      </p>
+
+      <p class="subtitle">State-of-the-art rotor game simulation (Alex Duesel, GPL-3.0)</p>
+
+      <button type="button" id="help-toggle" class="help-toggle" aria-expanded="false" aria-controls="help-panel">
+
+        Show help
+
+      </button>
+
+    </header>
+
+
+
+    <aside id="help-panel" class="help-panel" hidden>
+
+      <h2>Game help</h2>
+
+      <p class="help-intro">Simulation of a commercial slot machine with state machine, bonus scheme, and special rules.</p>
+
+      <details open>
+
+        <summary>Basics</summary>
+
+        <ul>
+
+          <li>3 reels × 2 rows, up to 4 paylines depending on mode.</li>
+
+          <li>Normal spin: <strong>20 Money</strong>, start: 2000.</li>
+
+          <li>Symbols: 7, 1BAR/2BAR/3BAR, JACK, coins 20C–160C.</li>
+
+        </ul>
+
+      </details>
+
+      <details>
+
+        <summary>Risk ladder</summary>
+
+        <p>After certain coin wins you enter a <strong>risk game</strong> instead of taking the prize immediately. You climb a ladder rung by rung — each successful step credits a higher prize; a failed step ends the risk game and returns to the reel game (unless special fail draws apply at the very top).</p>
+
+        <h3 class="help-sub">Which ladder?</h3>
+
+        <ul>
+
+          <li><strong>Risk Left</strong> — triggered by a <strong>50C×3</strong> win (also some Turbo-mode combinations). Ladder of larger left-side prizes up to 150 Turbo games.</li>
+
+          <li><strong>Risk Right</strong> — triggered by <strong>80C×3</strong> or <strong>160C×3</strong> wins. Ladder of right-side prizes up to 140 Turbo games.</li>
+
+        </ul>
+
+        <p>Your coin win sets the <strong>starting rung</strong> (e.g. 50C win → step 2 on Risk Left). The base coin amount is credited when the risk game begins; each successful climb credits the next rung shown on the ladder.</p>
+
+        <h3 class="help-sub">Rung layout (13 steps each)</h3>
+
+        <p>The panel shows both ladders; only the active side is highlighted. Steps count from 1 (bottom) to 13 (top). Completed rungs are marked done; the current rung pulses.</p>
+
+        <dl class="cheat-list">
+
+          <dt>Risk Left</dt>
+
+          <dd>30C → 50C → 100C → 200C → <strong>Draw 300</strong> → 3S → 6S → 12S → 12T → 25T → 50T → 100T → 150T</dd>
+
+          <dt>Risk Right</dt>
+
+          <dd>20C → 40C → 80C → 160C → <strong>Draw 200</strong> → 2S → 4S → 8S → 8T → 20T → 40T → 80T → 140T</dd>
+
+        </dl>
+
+        <p><strong>S</strong> = Super games, <strong>T</strong> = Turbo games, <strong>C</strong> = Money (cents).</p>
+
+        <h3 class="help-sub">Your four actions</h3>
+
+        <p>While the ladder border is flashing, use the buttons below it (same keys as the original CLI in parentheses):</p>
+
+        <ul>
+
+          <li><strong>Continue (50%)</strong> — Gamble: 50% chance to move up one rung (credits next prize), 50% chance to lose the risk game and return to reels.</li>
+
+          <li><strong>Win ↑ (5)</strong> — Force a successful step up (test / cheat input).</li>
+
+          <li><strong>Accept (4)</strong> — Stop climbing; take the prize of the <em>current</em> rung and exit to Win. On Risk Right step 11, accepting can also award a Jackpot point (special rule).</li>
+
+          <li><strong>Lose (1)</strong> — Force a failed step (drop out of the risk game).</li>
+
+        </ul>
+
+        <h3 class="help-sub">Outcomes</h3>
+
+        <ul>
+
+          <li><strong>Climb to the top</strong> (step 13) — automatic Win with the top prize.</li>
+
+          <li><strong>Fail before the top</strong> — back to reel game. If another winning line was pending from the same spin, that line is evaluated next (Normal / Four-Row modes).</li>
+
+          <li><strong>Fail at the top</strong> — consolation mini-game: Draw Fail 50 (Risk Left) or Draw Fail 40 (Risk Right).</li>
+
+          <li><strong>Step 5 auto-draw</strong> — reaching rung 5 (Draw 300 on Left / Draw 200 on Right) triggers that draw automatically; no button input on that step.</li>
+
+        </ul>
+
+        <h3 class="help-sub">Special rules</h3>
+
+        <ul>
+
+          <li><strong>Extra Point</strong> — on steps 6, 8, and 10, the next gamble uses a <strong>70% win chance</strong> and jumps <strong>two rungs</strong> on success.</li>
+
+          <li><strong>Extra-Plus counters</strong> — while active on the matching side, lower rungs also use 70% win chance.</li>
+
+          <li><strong>Blind mode (-b)</strong> — skips the risk ladder entirely; coin wins go straight to Win.</li>
+
+          <li>Reels stay visible during risk; the spin button is disabled until you return to the reel game.</li>
+
+        </ul>
+
+      </details>
+
+      <details>
+
+        <summary>Automatic mode</summary>
+
+        <p>Like CLI: <code>-n</code> game count, <code>-b</code> blind, <code>-r</code> total risk, <code>-a</code> accept 40TS, <code>-m</code> macro, <code>-l</code> logging. Macro example: <code>a5[10]1</code>.</p>
+
+      </details>
+
+      <details>
+
+        <summary>Cheat codes a–p</summary>
+
+        <p>Enter one letter in the cheat field, then press <strong>Spin</strong>. An empty field gives a random draw. Each code forces a fixed reel picture (top row left→right, then bottom row). Cheats also skip the automatic left-reel restart when neither left symbol is a premium symbol.</p>
+
+        <p>Effects below apply to the primary win in <strong>Normal</strong> mode (two horizontal lines). Codes <strong>o</strong> and <strong>p</strong> can trigger a second winning line on the bottom row. In Turbo / Four-Row mode, diagonal wins are evaluated as well.</p>
+
+        <dl class="cheat-list">
+
+          <dt>a</dt><dd>Top row 30C×3 → Draw 30 mini-game</dd>
+
+          <dt>b</dt><dd>Top row 20C×3 → Draw 20 mini-game</dd>
+
+          <dt>c</dt><dd>Top row JACK×3 → Jackpot</dd>
+
+          <dt>d</dt><dd>Both rows 50C–80C–30C → no win (test picture)</dd>
+
+          <dt>e</dt><dd>Top row 50C×3 → Risk Left ladder (50C)</dd>
+
+          <dt>f</dt><dd>Top row 160C×3 → Risk Right ladder (160C)</dd>
+
+          <dt>g</dt><dd>Top row 50C–80C–160C → no win (test picture)</dd>
+
+          <dt>h</dt><dd>Top row 50C–80C–JACK → no win (test picture)</dd>
+
+          <dt>i</dt><dd>Top row 50C–80C–3BAR → no win (test picture)</dd>
+
+          <dt>j</dt><dd>Top row JACK×3 → Jackpot (different bottom row than <strong>c</strong>)</dd>
+
+          <dt>k</dt><dd>Top row 50C–80C–7 → no win (test picture)</dd>
+
+          <dt>l</dt><dd>Top row 50C–80C–7, bottom 50C–80C–30C → no win (test picture)</dd>
+
+          <dt>m</dt><dd>Top row 80C–50C–80C → no win (test picture)</dd>
+
+          <dt>n</dt><dd>Bottom row 160C×3 → Risk Right ladder (160C)</dd>
+
+          <dt>o</dt><dd>Top row 2BAR×3 → Draw 3×BAR; bottom 160C×3 → Risk Right (two wins)</dd>
+
+          <dt>p</dt><dd>Top row 7×3 → Draw triple-7; bottom 160C×3 → Risk Right (two wins)</dd>
+
+        </dl>
+
+      </details>
+
+    </aside>
+
+
+
+    <main class="machine-body">
+
+      <section class="panel panel-left">
+
+        <h2>ASCII Reels</h2>
+
+        <pre id="ascii-reels" class="ascii-reels" aria-live="polite">Loading reels…</pre>
+
+        <h2>Game Log</h2>
+
+        <pre id="game-log" class="game-log" aria-live="polite"></pre>
+
+
+
+        <div class="panel-controls">
+
+          <p id="prompt-line" class="prompt-line">Loading...</p>
+
+          <div id="restart-row" class="control-row restart-row" hidden>
+
+            <button id="restart-btn" type="button" class="restart-btn">Restart interactive</button>
+
+          </div>
+
+          <div id="rollers-controls" class="control-section control-section--active">
+
+            <p class="control-label">Reel game</p>
+
+            <div class="control-row">
+
+              <label for="cheat-input" class="sr-only">Cheat code</label>
+
+              <input
+
+                id="cheat-input"
+
+                type="text"
+
+                class="game-input"
+
+                maxlength="16"
+
+                placeholder="Cheat a–p (optional)"
+
+                autocomplete="off"
+
+              />
+
+              <button id="spin-btn" type="button" class="spin-btn">Spin</button>
+
+            </div>
+
+          </div>
+
+          <p class="hint hint-compact">Spin = reel game · Risk buttons below the ladder on the right</p>
+
+
+
+          <div id="auto-controls" class="control-section control-section--active auto-controls">
+
+            <p class="control-label">Automatic mode</p>
+
+            <div class="auto-top-row">
+
+              <label class="auto-inline" for="auto-num-games">Games (-n)</label>
+
+              <input id="auto-num-games" type="number" class="game-input auto-num-input" min="1" max="100000000" value="1000" />
+
+              <label class="auto-inline auto-logging"><input id="auto-logging" type="checkbox" /> Log (-l)</label>
+
+            </div>
+
+            <div class="auto-mode-grid" role="radiogroup" aria-label="Automatic mode">
+
+              <label class="auto-option"><input type="radio" name="auto-mode" value="normal" checked /> Normal</label>
+
+              <label class="auto-option"><input type="radio" name="auto-mode" value="blind" /> Blind (-b)</label>
+
+              <label class="auto-option"><input type="radio" name="auto-mode" value="total" /> Total (-r)</label>
+
+              <label class="auto-option"><input type="radio" name="auto-mode" value="receiving40" /> 40TS (-a)</label>
+
+              <label class="auto-option"><input type="radio" name="auto-mode" value="macro" /> Macro (-m)</label>
+
+            </div>
+
+            <input id="auto-macro-input" type="text" class="game-input auto-macro-input" placeholder="Macro code, e.g. a5[10]1" disabled autocomplete="off" />
+
+            <div class="control-row auto-actions">
+
+              <button id="auto-start-btn" type="button" class="auto-btn">Start auto</button>
+
+              <button id="auto-stop-btn" type="button" class="auto-btn auto-btn-stop" disabled>Stop</button>
+
+            </div>
+
+            <p id="auto-status" class="auto-status" hidden></p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <section class="panel panel-right">
+
+        <h2>Reels</h2>
+
+        <div id="svg-reels" class="svg-reels" aria-label="Slot reel symbols"></div>
+
+        <div id="counter-display" class="counter-display" aria-live="polite"></div>
+
+
+
+        <h2>Risk ladder</h2>
+
+        <div id="risk-ladder-panel" class="risk-ladder-panel">
+
+          <div class="ladders-wrap">
+
+            <div class="ladder-col">
+
+              <p class="ladder-title">Risk Left</p>
+
+              <div id="ladder-left" class="ladder"></div>
+
+            </div>
+
+            <div class="ladder-col">
+
+              <p class="ladder-title">Risk Right</p>
+
+              <div id="ladder-right" class="ladder"></div>
+
+            </div>
+
+          </div>
+
+          <p id="risk-status" class="risk-status">No risk game yet</p>
+
+          <div id="risk-actions" class="risk-actions">
+
+            <button type="button" class="risk-btn risk-btn-step" data-input="">Continue (50%)</button>
+
+            <button type="button" class="risk-btn risk-btn-win" data-input="5">Win ↑ (5)</button>
+
+            <button type="button" class="risk-btn risk-btn-accept" data-input="4">Accept (4)</button>
+
+            <button type="button" class="risk-btn risk-btn-fail" data-input="1">Lose (1)</button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+
+  <script src="slotmachine_tables.js"></script>
+
+  <script src="slotmachine_main.js"></script>
+
+  <script src="slotmachine_ui.js"></script>
+
+</body>
+
+</html>
+
