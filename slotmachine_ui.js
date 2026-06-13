@@ -174,7 +174,7 @@ let autoModeActive = false;
 let gameFinished = false;
 
 function setRestartVisible(visible) {
-  if (restartRow) restartRow.hidden = !visible;
+  if (restartRow) restartRow.hidden = false;
 }
 
 function setAutoStatus(text) {
@@ -280,7 +280,7 @@ async function runGameLoop({ interactive, introLog, readyPrompt, auto }) {
   gameRunning = true;
   gameFinished = false;
   autoModeActive = auto;
-  setRestartVisible(false);
+  setRestartVisible(true);
   updateAutoControls();
 
   try {
@@ -311,21 +311,29 @@ async function runGameLoop({ interactive, introLog, readyPrompt, auto }) {
 
   if (promptEl) {
     promptEl.textContent = interactive
-      ? 'Game over — use “Restart interactive” or start auto'
-      : 'Auto run finished — use “Restart interactive” or start auto again';
+      ? 'Game over — press Restart game or start auto'
+      : 'Auto run finished — press Restart game or start auto again';
   }
-  setAutoStatus('Finished. Restart interactive or configure auto again.');
+  setAutoStatus('Finished. Restart game or configure auto again.');
   setRestartVisible(true);
   updateControls();
 }
 
 async function onRestartClick() {
-  if (gameRunning) return;
+  if (gameRunning) {
+    if (resolveInput) {
+      submitInput('q');
+    } else {
+      getEngine().requestStop();
+    }
+    await waitForGameLoopEnd();
+  }
   getEngine().resetSimulation();
   resolveInput = null;
   pendingInputState = null;
   pendingInputIndex = null;
-  appendLog('\n--- Interactive restart ---\n');
+  gameFinished = false;
+  appendLog('\n--- Restart game ---\n');
   await startInteractiveGame();
 }
 
