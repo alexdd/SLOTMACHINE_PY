@@ -140,6 +140,8 @@ let ADVANCED_LOGGING = 1;
 let TEXT_MODE = 0;
 /** When 1 (default), every interactive spin sets cheatrun like classic CLI -i (skips left reel restart). */
 let INTERACTIVE_CLI_INPUT = 1;
+/** When 1 (default), cheatrun applies get_cheatrun (letters a–p force fixed pictures, incl. risk-ladder wins). */
+let INTERACTIVE_APPLY_CHEAT_PICTURES = 1;
 const RISK_FINISHED = 12;
 const UNDEFINED = -1;
 const COLUMN_WIN_COMBINATIONS = 0;
@@ -262,6 +264,7 @@ function resetSimulation() {
   RECEIVING_40 = 0;
   TEST = 0;
   INTERACTIVE_CLI_INPUT = 1;
+  INTERACTIVE_APPLY_CHEAT_PICTURES = 1;
   NUM_GAMES = 3400000;
   macro_list = '';
   game_mode = NORMAL;
@@ -341,6 +344,9 @@ function configureGame(opts = {}) {
   if (opts.advancedLogging != null) ADVANCED_LOGGING = opts.advancedLogging;
   if (opts.macroList != null) macro_list = opts.macroList;
   if (opts.interactiveCliInput != null) INTERACTIVE_CLI_INPUT = opts.interactiveCliInput;
+  if (opts.interactiveApplyCheatPictures != null) {
+    INTERACTIVE_APPLY_CHEAT_PICTURES = opts.interactiveApplyCheatPictures;
+  }
 }
 
 function shouldInteractiveCheatRun(xinput) {
@@ -892,13 +898,16 @@ function normal_process(statedict, name, index) {
     CYLINDER[0][rotorpos[3]], CYLINDER[1][rotorpos[4]], CYLINDER[2][rotorpos[5]],
   ];
   if (cheatrun) {
-    picture = get_cheatrun(cheatcode, picture);
-    rotorpos[0] = CYLINDER[0].indexOf(picture[0]);
-    rotorpos[1] = CYLINDER[1].indexOf(picture[1]);
-    rotorpos[2] = CYLINDER[2].indexOf(picture[2]);
-    rotorpos[3] = CYLINDER[0].indexOf(picture[3]);
-    rotorpos[4] = CYLINDER[1].indexOf(picture[4]);
-    rotorpos[5] = CYLINDER[2].indexOf(picture[5]);
+    const applyCheatPicture = !INTERACTIVE || INTERACTIVE_APPLY_CHEAT_PICTURES;
+    if (applyCheatPicture) {
+      picture = get_cheatrun(cheatcode, picture);
+      rotorpos[0] = CYLINDER[0].indexOf(picture[0]);
+      rotorpos[1] = CYLINDER[1].indexOf(picture[1]);
+      rotorpos[2] = CYLINDER[2].indexOf(picture[2]);
+      rotorpos[3] = CYLINDER[0].indexOf(picture[3]);
+      rotorpos[4] = CYLINDER[1].indexOf(picture[4]);
+      rotorpos[5] = CYLINDER[2].indexOf(picture[5]);
+    }
   }
   const winsymbole = [S1BAR, S2BAR, S3BAR, S7, JACK];
   if (!winsymbole.includes(picture[TOP_LEFT]) &&
@@ -1590,6 +1599,7 @@ window.SlotMain = {
   get RECEIVING_40() { return RECEIVING_40; },
   get TEST() { return TEST; },
   get INTERACTIVE_CLI_INPUT() { return INTERACTIVE_CLI_INPUT; },
+  get INTERACTIVE_APPLY_CHEAT_PICTURES() { return INTERACTIVE_APPLY_CHEAT_PICTURES; },
   shouldInteractiveCheatRun,
   MONEY, JP, TURBO, SUPER, FOUR_ROW, EXTRA_POINT, ROLLERS, RISK_L, RISK_R, END_OF_GAME, UNDEFINED,
 };

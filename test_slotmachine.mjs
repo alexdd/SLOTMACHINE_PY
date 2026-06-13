@@ -107,6 +107,12 @@ test('shouldInteractiveCheatRun fair spins only with cheat input', () => {
   assert.strictEqual(M.shouldInteractiveCheatRun('SUPER 3'), true);
 });
 
+test('interactiveApplyCheatPictures defaults on', () => {
+  M.resetSimulation();
+  M.configureGame({ interactive: 1 });
+  assert.strictEqual(M.INTERACTIVE_APPLY_CHEAT_PICTURES, 1);
+});
+
 test('create_inner_string expands bracket syntax', () => {
   assert.strictEqual(M.create_inner_string('a5[10]1'), 'a55555555551');
 });

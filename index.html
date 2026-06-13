@@ -52,7 +52,7 @@
 
       <p class="help-intro">Simulation of a commercial slot machine with state machine, bonus scheme, and special rules.</p>
 
-      <details open>
+      <details>
 
         <summary>Basics</summary>
 
@@ -65,6 +65,58 @@
           <li>Symbols: 7, 1BAR/2BAR/3BAR, JACK, coins 20C–160C.</li>
 
         </ul>
+
+        <h3 class="help-sub">Controls (HTML5 UI)</h3>
+
+        <ul>
+
+          <li><strong>Left panel</strong> — ASCII reels, game log, cheat field + <strong>Spin</strong>, two option checkboxes (see Interactive mode), automatic batch mode, <strong>Restart game</strong>.</li>
+
+          <li><strong>Right panel</strong> — SVG reels, counters, risk ladder with four action buttons when a risk game is active.</li>
+
+          <li>During risk, Spin is disabled; use the ladder buttons instead (same keys as CLI: empty = 50% step, <code>5</code> win, <code>4</code> accept, <code>1</code> lose).</li>
+
+        </ul>
+
+      </details>
+
+      <details class="help-interactive">
+
+        <summary>Interactive mode</summary>
+
+        <p>In interactive play, each spin sends an input line to the engine — like the original CLI <code>-i</code> mode. The two checkboxes below Spin apply only here (not in automatic batch mode). You can change them at any time during interactive play; they take effect on the next spin.</p>
+
+        <h3 class="help-sub">Every spin skips left-reel restart (CLI -i / cheatrun)</h3>
+
+        <p>Default: <strong>on</strong>. When enabled, <strong>every</strong> spin sets <code>cheatrun</code>, even with an empty cheat field — like the legacy CLI <code>-i</code> mode. Main effect: the <strong>left reel restart</strong> rule is skipped (no re-roll of the left column when neither left cell is a premium symbol). Payout tends to be <em>higher</em> than fair spins. This does <em>not</em> force a fixed reel picture on empty spins; it only changes the restart rule. More wins indirectly mean more risk-ladder entries, but the ladder itself is still played manually with the buttons.</p>
+
+        <p>When disabled (<strong>Fair spins</strong>), an empty spin behaves like automatic batch mode: left reel restart applies; <code>cheatrun</code> is only set if you enter a cheat letter <strong>a–p</strong> or a debug command.</p>
+
+        <h3 class="help-sub">Cheat letters a–p force fixed reel picture (risk ladder)</h3>
+
+        <p>Default: <strong>on</strong>. When enabled, a cheat letter <strong>a–p</strong> replaces the random draw with a fixed reel picture from the cheat table (<code>get_cheatrun</code>). Many of these pictures are coin wins and therefore start the <strong>risk ladder</strong> (e.g. code <code>e</code> → three 50c symbols → Risk Left). When disabled, cheat letters still set <code>cheatrun</code> (and still skip left reel restart if the first checkbox is on), but the random reel draw is kept — useful to test without forcing risk-ladder scenarios.</p>
+
+        <h3 class="help-sub">Debug commands (cheat field + Spin)</h3>
+
+        <p>These work in interactive mode regardless of the checkboxes:</p>
+
+        <ul>
+
+          <li><code>SUPER n</code> — add <strong>n</strong> Super games</li>
+
+          <li><code>TURBO n</code> — add <strong>n</strong> Turbo games</li>
+
+          <li><code>EXTRA n</code> — add <strong>n</strong> Extra points (70% risk wins on steps 6/8/10)</li>
+
+          <li><code>JACKS n</code> — add <strong>n</strong> Jackpot points</li>
+
+          <li><code>MONEY n</code> — add <strong>n</strong> Money</li>
+
+        </ul>
+
+        <h3 class="help-sub">Restart game</h3>
+
+        <p><strong>Restart game</strong> stops the current run (like CLI <code>q</code>), resets counters and state, and starts a fresh interactive session. Usable anytime — also while automatic mode or a risk game is running.</p>
 
       </details>
 
@@ -162,7 +214,9 @@
 
         <summary>Cheat codes a–p</summary>
 
-        <p>Enter one letter in the cheat field, then press <strong>Spin</strong>. An empty field gives a random draw. Each code forces a fixed reel picture (top row left→right, then bottom row). Cheats also skip the automatic left-reel restart when neither left symbol is a premium symbol.</p>
+        <p>Enter one letter in the cheat field, then press <strong>Spin</strong>. An empty field gives a random draw (unless the <strong>Cheat letters a–p force fixed reel picture</strong> checkbox is off and Classic CLI is off — see Interactive mode).</p>
+
+        <p>When cheat pictures are enabled (default), each letter forces a fixed reel picture (top row left→right, then bottom row). Letters also set <code>cheatrun</code>, which skips the automatic left-reel restart when neither left symbol is a premium symbol — if <strong>Every spin skips left-reel restart</strong> is on, that skip applies to every spin anyway.</p>
 
         <p>Effects below apply to the primary win in <strong>Normal</strong> mode (two horizontal lines). Codes <strong>o</strong> and <strong>p</strong> can trigger a second winning line on the bottom row. In Turbo / Four-Row mode, diagonal wins are evaluated as well.</p>
 
@@ -204,20 +258,6 @@
 
       </details>
 
-      <details>
-
-        <summary>Interactive mode</summary>
-
-        <p>In interactive play, each spin sends an input line to the engine — like the original CLI interactive mode.</p>
-
-        <h3 class="help-sub">Classic CLI spins (checkbox, default on)</h3>
-
-        <p>When enabled, <strong>every</strong> spin sets <code>cheatrun</code>, even with an empty cheat field — like the legacy CLI where any input line (including empty) triggers cheat mode. Side effect: the <strong>left reel restart</strong> rule is skipped (no re-roll of the left column when neither left cell is a premium symbol). Payout tends to be <em>higher</em> than fair spins.</p>
-
-        <p>When disabled (<strong>Fair spins</strong>), an empty spin behaves like automatic batch mode: left reel restart applies; <code>cheatrun</code> is only set if you enter a cheat letter <strong>a–p</strong> or a debug command (<code>SUPER 10</code>, …).</p>
-
-      </details>
-
     </aside>
 
 
@@ -225,6 +265,8 @@
     <main class="machine-body">
 
       <section class="panel panel-left">
+
+        <button type="button" id="help-toggle-embed" class="help-toggle help-toggle--embed" aria-expanded="false" aria-controls="help-panel">Show help</button>
 
         <h2>ASCII Reels</h2>
 
@@ -277,9 +319,16 @@
           </div>
 
             <div class="control-row control-row--option">
-              <label class="spin-option">
+              <label class="spin-option" title="Like CLI -i: every spin sets cheatrun and skips the left-reel restart rule (empty spin = higher payout, random picture).">
                 <input type="checkbox" id="interactive-cli-input" checked />
-                Classic CLI spins (always cheatrun)
+                Every spin skips left-reel restart (CLI -i / cheatrun)
+              </label>
+            </div>
+
+            <div class="control-row control-row--option">
+              <label class="spin-option" title="Letters a–p replace the random draw with fixed reel pictures; many are coin wins that start the risk ladder (e.g. e → Risk Left 50c).">
+                <input type="checkbox" id="interactive-apply-cheat-pictures" checked />
+                Cheat letters a–p force fixed reel picture (risk ladder)
               </label>
             </div>
 

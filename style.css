@@ -19,7 +19,7 @@
   --gold: var(--green);
   --accent: var(--link);
   --reel-bg: #121721;
-  --panel-height: 52rem;
+  --panel-height: 58rem;
   --ascii-height: 11rem;
   --log-height: calc(14.5rem - 80px);
   --reel-row-height: 6.25rem;
@@ -52,8 +52,16 @@ html.embed .machine-header {
   display: none;
 }
 
-html.embed .help-panel {
-  display: none !important;
+html.embed .help-panel:not([hidden]) {
+  display: block;
+  max-height: 22rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-bottom: 0.65rem;
+}
+
+html.embed .help-panel .help-interactive {
+  border-color: var(--green);
 }
 
 html.embed .machine {
@@ -127,6 +135,16 @@ html.embed .panel {
 .help-toggle:hover {
   background: rgba(96, 165, 250, 0.15);
   border-color: var(--link);
+}
+
+.help-toggle--embed {
+  display: none;
+  width: 100%;
+  margin: 0 0 0.65rem;
+}
+
+html.embed .help-toggle--embed {
+  display: block;
 }
 
 .help-panel {
@@ -206,9 +224,18 @@ html.embed .panel {
 .help-panel code {
   background: var(--surface);
   color: var(--link);
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  padding: 0 0.22em !important;
+  margin: 0 !important;
+  border-radius: 2px;
+  font-size: 0.88em;
+  font-family: Consolas, "Courier New", monospace;
+  line-height: 1 !important;
+  display: inline !important;
+  overflow: visible !important;
+  vertical-align: baseline;
+  white-space: nowrap;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .machine-body {
@@ -313,7 +340,7 @@ html.embed .panel {
 }
 
 .auto-controls {
-  margin-top: 0.45rem;
+  margin-top: calc(0.45rem + 4px);
   padding-top: 0.45rem;
   border-top: 1px solid var(--panel-border);
 }
@@ -687,6 +714,10 @@ html.embed .panel {
   margin-bottom: 0.45rem;
 }
 
+#rollers-controls {
+  margin-top: 4px;
+}
+
 .restart-btn {
   width: 100%;
   padding: 0.45rem 0.75rem;
@@ -719,6 +750,15 @@ html.embed .panel {
 
 .spin-option input {
   accent-color: var(--green);
+}
+
+.spin-option input:disabled {
+  cursor: not-allowed;
+}
+
+.spin-option:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .spin-option code {

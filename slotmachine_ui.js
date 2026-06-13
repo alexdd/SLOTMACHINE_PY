@@ -148,6 +148,7 @@ let promptEl;
 let counterEl;
 let cheatInput;
 let interactiveCliInputCheckbox;
+let interactiveApplyCheatPicturesCheckbox;
 let spinBtn;
 let rollersControls;
 let riskLadderPanel;
@@ -216,7 +217,10 @@ function updateAutoControls() {
   }
   if (cheatInput) cheatInput.disabled = autoModeActive || !canSpin;
   if (interactiveCliInputCheckbox) {
-    interactiveCliInputCheckbox.disabled = autoModeActive || gameRunning;
+    interactiveCliInputCheckbox.disabled = autoModeActive;
+  }
+  if (interactiveApplyCheatPicturesCheckbox) {
+    interactiveApplyCheatPicturesCheckbox.disabled = autoModeActive;
   }
 }
 
@@ -266,6 +270,19 @@ function buildAutoConfigure(mode, numGames, logging, macroCode) {
 function applyInteractiveOptions() {
   getEngine().configureGame({
     interactiveCliInput: interactiveCliInputCheckbox?.checked !== false ? 1 : 0,
+    interactiveApplyCheatPictures: interactiveApplyCheatPicturesCheckbox?.checked !== false ? 1 : 0,
+  });
+}
+
+function bindHelpToggle(toggle) {
+  if (!toggle || !helpPanel) return;
+  toggle.addEventListener('click', () => {
+    const open = helpPanel.hidden;
+    helpPanel.hidden = !open;
+    document.querySelectorAll('#help-toggle, #help-toggle-embed').forEach((btn) => {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Hide help' : 'Show help';
+    });
   });
 }
 
@@ -634,6 +651,7 @@ function init() {
     counterEl = document.getElementById('counter-display');
     cheatInput = document.getElementById('cheat-input');
     interactiveCliInputCheckbox = document.getElementById('interactive-cli-input');
+    interactiveApplyCheatPicturesCheckbox = document.getElementById('interactive-apply-cheat-pictures');
     spinBtn = document.getElementById('spin-btn');
     rollersControls = document.getElementById('rollers-controls');
     riskLadderPanel = document.getElementById('risk-ladder-panel');
@@ -683,13 +701,17 @@ function init() {
       });
     }
 
-    if (helpToggle && helpPanel) {
-      helpToggle.addEventListener('click', () => {
-        const open = helpPanel.hidden;
-        helpPanel.hidden = !open;
-        helpToggle.setAttribute('aria-expanded', String(open));
-        helpToggle.textContent = open ? 'Hide help' : 'Show help';
+    if (interactiveApplyCheatPicturesCheckbox) {
+      interactiveApplyCheatPicturesCheckbox.addEventListener('change', () => {
+        if (gameRunning && !autoModeActive) {
+          applyInteractiveOptions();
+        }
       });
+    }
+
+    if (helpToggle && helpPanel) {
+      bindHelpToggle(helpToggle);
+      bindHelpToggle(document.getElementById('help-toggle-embed'));
     }
 
     document.querySelectorAll('input[name="auto-mode"]').forEach((radio) => {
