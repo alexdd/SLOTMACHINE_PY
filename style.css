@@ -42,6 +42,25 @@ body {
   font-family: "Segoe UI", system-ui, sans-serif;
 }
 
+html.embed,
+html.embed body {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+html.embed .machine-header {
+  display: none;
+}
+
+html.embed .help-panel {
+  display: none !important;
+}
+
+html.embed .machine {
+  max-width: 1280px;
+  padding-top: 0.5rem;
+}
+
 .machine {
   max-width: 1280px;
   margin: 0 auto;
