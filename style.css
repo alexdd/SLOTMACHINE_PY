@@ -44,8 +44,7 @@ body {
 
 html.embed,
 html.embed body {
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto;
 }
 
 html.embed .machine-header {
