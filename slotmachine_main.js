@@ -974,7 +974,7 @@ function print_bottom() {
 function log_normal(frame_nr, statedict, name, index) {
   num_games += 1;
   if (LOGGING || INTERACTIVE) {
-    uiPrint("#############################################################");
+    uiPrint("###################################################");
     uiPrint(`Game No.: ${String(frame_nr)} is a ${name}`);
     uiPrint(`Mode: ${game_mode}`);
     if (ADVANCED_LOGGING) {

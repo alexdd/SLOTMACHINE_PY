@@ -953,7 +953,7 @@ def log_normal(frame_nr, statedict, name, index):
   global picture
   num_games+=1
   if LOGGING or INTERACTIVE:
-    print "#############################################################"
+    print "###################################################"
     print "Game No.: %s is a %s" % (str(frame_nr),name)
     print "Mode: ",game_mode 
     if ADVANCED_LOGGING:
