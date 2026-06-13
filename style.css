@@ -19,11 +19,11 @@
   --gold: var(--green);
   --accent: var(--link);
   --reel-bg: #121721;
-  --panel-height: 58rem;
+  --panel-height: calc(58rem + 40px);
   --ascii-height: 11rem;
-  --log-height: calc(14.5rem - 60px);
+  --log-height: calc(14.5rem - 40px);
   --reel-row-height: 6.25rem;
-  --counter-height: calc(5.5rem + 20px);
+  --counter-height: calc(5.5rem + 40px);
   --ladder-rung-height: 1.28rem;
   --risk-actions-height: 4.75rem;
 }
