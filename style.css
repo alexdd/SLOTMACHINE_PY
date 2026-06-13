@@ -19,11 +19,13 @@
   --gold: var(--green);
   --accent: var(--link);
   --reel-bg: #121721;
-  --panel-height: calc(58rem + 40px);
+  --panel-height: calc(58rem + 50px);
   --ascii-height: 11rem;
-  --log-height: calc(14.5rem - 40px);
+  --log-height: calc(14.5rem - 30px);
   --reel-row-height: 6.25rem;
-  --counter-height: calc(5.5rem + 40px);
+  /* 7 lines max: Money, JP, Turbo, Super, Four-Row, Extra, Carry */
+  --counter-lines: 7;
+  --counter-height: calc(1.3rem + var(--counter-lines) * 0.82rem * 1.35);
   --ladder-rung-height: 1.28rem;
   --risk-actions-height: 4.75rem;
 }
