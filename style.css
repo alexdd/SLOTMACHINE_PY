@@ -703,6 +703,28 @@ html.embed .panel {
   background: rgba(46, 204, 113, 0.18);
 }
 
+.control-row--option {
+  margin-top: 0.35rem;
+}
+
+.spin-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.spin-option input {
+  accent-color: var(--green);
+}
+
+.spin-option code {
+  font-size: 0.78rem;
+}
+
 .panel-controls .hint {
   margin: 0.5rem 0 0;
 }

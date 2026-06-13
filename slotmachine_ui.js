@@ -54,6 +54,7 @@ function symbolAscii(sym) {
 
 function getWinningPositions() {
   const engine = getEngine();
+  if (isRollersState(getActiveState()) && isWaitingForInput()) return [];
   if (!engine.winning_combinations?.length) return [];
   const nextLine = engine.naechste_linie;
   if (nextLine?.length >= 3) return nextLine;
@@ -146,6 +147,7 @@ let svgGridEl;
 let promptEl;
 let counterEl;
 let cheatInput;
+let interactiveCliInputCheckbox;
 let spinBtn;
 let rollersControls;
 let riskLadderPanel;
@@ -213,6 +215,9 @@ function updateAutoControls() {
     spinBtn.hidden = false;
   }
   if (cheatInput) cheatInput.disabled = autoModeActive || !canSpin;
+  if (interactiveCliInputCheckbox) {
+    interactiveCliInputCheckbox.disabled = autoModeActive || gameRunning;
+  }
 }
 
 function readAutoMode() {
@@ -258,6 +263,12 @@ function buildAutoConfigure(mode, numGames, logging, macroCode) {
   engine.configureGame(opts);
 }
 
+function applyInteractiveOptions() {
+  getEngine().configureGame({
+    interactiveCliInput: interactiveCliInputCheckbox?.checked !== false ? 1 : 0,
+  });
+}
+
 async function waitForGameLoopEnd() {
   while (gameRunning) {
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -275,6 +286,7 @@ async function runGameLoop({ interactive, introLog, readyPrompt, auto }) {
   try {
     getEngine().setUiHooks(uiPrint, uiWaitInput);
     if (interactive) {
+      applyInteractiveOptions();
       getEngine().enableInteractiveMode();
     }
     updateDisplay();
@@ -613,6 +625,7 @@ function init() {
     promptEl = document.getElementById('prompt-line');
     counterEl = document.getElementById('counter-display');
     cheatInput = document.getElementById('cheat-input');
+    interactiveCliInputCheckbox = document.getElementById('interactive-cli-input');
     spinBtn = document.getElementById('spin-btn');
     rollersControls = document.getElementById('rollers-controls');
     riskLadderPanel = document.getElementById('risk-ladder-panel');
@@ -653,6 +666,14 @@ function init() {
         submitInput(btn.dataset.input ?? '');
       });
     });
+
+    if (interactiveCliInputCheckbox) {
+      interactiveCliInputCheckbox.addEventListener('change', () => {
+        if (gameRunning && !autoModeActive) {
+          applyInteractiveOptions();
+        }
+      });
+    }
 
     if (helpToggle && helpPanel) {
       helpToggle.addEventListener('click', () => {

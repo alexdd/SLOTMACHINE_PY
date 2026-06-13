@@ -204,6 +204,20 @@
 
       </details>
 
+      <details>
+
+        <summary>Interactive mode</summary>
+
+        <p>In interactive play, each spin sends an input line to the engine — like the original CLI interactive mode.</p>
+
+        <h3 class="help-sub">Classic CLI spins (checkbox, default on)</h3>
+
+        <p>When enabled, <strong>every</strong> spin sets <code>cheatrun</code>, even with an empty cheat field — like the legacy CLI where any input line (including empty) triggers cheat mode. Side effect: the <strong>left reel restart</strong> rule is skipped (no re-roll of the left column when neither left cell is a premium symbol). Payout tends to be <em>higher</em> than fair spins.</p>
+
+        <p>When disabled (<strong>Fair spins</strong>), an empty spin behaves like automatic batch mode: left reel restart applies; <code>cheatrun</code> is only set if you enter a cheat letter <strong>a–p</strong> or a debug command (<code>SUPER 10</code>, …).</p>
+
+      </details>
+
     </aside>
 
 
@@ -262,7 +276,14 @@
 
           </div>
 
-          <p class="hint hint-compact">Spin = reel game · Risk buttons below the ladder on the right</p>
+            <div class="control-row control-row--option">
+              <label class="spin-option">
+                <input type="checkbox" id="interactive-cli-input" checked />
+                Classic CLI spins (always cheatrun)
+              </label>
+            </div>
+
+            <p class="hint hint-compact">Spin = reel game · Risk buttons below the ladder on the right</p>
 
 
 

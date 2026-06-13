@@ -138,6 +138,8 @@ let TEST = 0;
 let RECEIVING_40 = 0;
 let ADVANCED_LOGGING = 1;
 let TEXT_MODE = 0;
+/** When 1 (default), every interactive spin sets cheatrun like classic CLI -i (skips left reel restart). */
+let INTERACTIVE_CLI_INPUT = 1;
 const RISK_FINISHED = 12;
 const UNDEFINED = -1;
 const COLUMN_WIN_COMBINATIONS = 0;
@@ -259,6 +261,7 @@ function resetSimulation() {
   TOTAL = 0;
   RECEIVING_40 = 0;
   TEST = 0;
+  INTERACTIVE_CLI_INPUT = 1;
   NUM_GAMES = 3400000;
   macro_list = '';
   game_mode = NORMAL;
@@ -337,9 +340,45 @@ function configureGame(opts = {}) {
   if (opts.test != null) TEST = opts.test;
   if (opts.advancedLogging != null) ADVANCED_LOGGING = opts.advancedLogging;
   if (opts.macroList != null) macro_list = opts.macroList;
+  if (opts.interactiveCliInput != null) INTERACTIVE_CLI_INPUT = opts.interactiveCliInput;
+}
+
+function shouldInteractiveCheatRun(xinput) {
+  if (!INTERACTIVE) return false;
+  if (INTERACTIVE_CLI_INPUT) return true;
+  return xinput.length > 0;
+}
+
+let randomCallSequence = null;
+let randomCallIndex = 0;
+
+function setRandomCallSequence(calls) {
+  randomCallSequence = calls;
+  randomCallIndex = 0;
+}
+
+function resetRandomCallSequence() {
+  randomCallSequence = null;
+  randomCallIndex = 0;
 }
 
 function randint(a, b) {
+  if (randomCallSequence) {
+    if (randomCallIndex >= randomCallSequence.length) {
+      throw new Error(`Random call sequence exhausted at index ${randomCallIndex}`);
+    }
+    const entry = randomCallSequence[randomCallIndex];
+    randomCallIndex += 1;
+    const lo = entry[0];
+    const hi = entry[1];
+    const value = entry[2];
+    if (lo !== a || hi !== b) {
+      throw new Error(
+        `Random mismatch at call ${randomCallIndex}: expected randint(${a}, ${b}), got (${lo}, ${hi})`
+      );
+    }
+    return value;
+  }
   return Math.floor(Math.random() * (b - a + 1)) + a;
 }
 
@@ -912,6 +951,7 @@ function normal_process(statedict, name, index) {
     put_into_account(statedict[name][TABLE], idx, winning_plan[idx]);
     return [winning_plan[idx][COLUMN_NEXT_STATE], idx];
   }
+  winning_line = [];
   return [ROLLERS, DEFAULT];
 }
 
@@ -1069,6 +1109,11 @@ async function handle_keys_textmode(state, index) {
   if (INTERACTIVE) {
     currentState = state;
     currentIndex = index;
+    if (state === ROLLERS) {
+      winning_combinations = [];
+      winning_line = [];
+      naechste_linie = [];
+    }
     const strg = `Next State: ${state} \nInput: `;
     const xinput = await uiWaitInput(strg, state, index);
     if (state === ROLLERS) {
@@ -1107,8 +1152,10 @@ async function handle_keys_textmode(state, index) {
       else if (xinput === "5") risk_win_flg = 1;
       else if (xinput === "4") risk_accept_flg = 1;
     } else if (state === ROLLERS) {
-      cheatrun = 1;
-      cheatcode = xinput;
+      if (shouldInteractiveCheatRun(xinput)) {
+        cheatrun = 1;
+        cheatcode = xinput;
+      }
     }
   } else if (MACRO) {
     if (macro_list.length === 0) return END_OF_GAME;
@@ -1466,7 +1513,7 @@ function create_inner_string(strg) {
     } else if (strg[i] === ']') {
       do_int = 0;
       const x = parseInt(int_puff, 10) - 1;
-      inner += x * c;
+      inner += c.repeat(Math.max(0, x));
       int_puff = '';
       c = '';
     } else if (do_int) {
@@ -1522,14 +1569,27 @@ for (const name of Object.keys(stats)) {
 
 window.SlotMain = {
   main, setUiHooks, enableInteractiveMode, configureGame, print_stats, create_macro,
-  resetSimulation, requestStop,
+  resetSimulation, requestStop, setRandomCallSequence, resetRandomCallSequence,
   getState, getIndex, STATES,
+  compare_picture_with_plan, compare_draw_table, get_cheatrun, create_inner_string,
   get picture() { return picture; },
   get game_mode() { return game_mode; },
   get winning_line() { return winning_line; },
   get naechste_linie() { return naechste_linie; },
   get winning_combinations() { return winning_combinations; },
+  get num_games() { return num_games; },
+  get num_won() { return num_won; },
+  get num_draws() { return num_draws; },
   counter, carry,
-  NUM_GAMES, INTERACTIVE, LOGGING, BLIND, MACRO, TOTAL, RECEIVING_40, TEST,
+  get NUM_GAMES() { return NUM_GAMES; },
+  get INTERACTIVE() { return INTERACTIVE; },
+  get LOGGING() { return LOGGING; },
+  get BLIND() { return BLIND; },
+  get MACRO() { return MACRO; },
+  get TOTAL() { return TOTAL; },
+  get RECEIVING_40() { return RECEIVING_40; },
+  get TEST() { return TEST; },
+  get INTERACTIVE_CLI_INPUT() { return INTERACTIVE_CLI_INPUT; },
+  shouldInteractiveCheatRun,
   MONEY, JP, TURBO, SUPER, FOUR_ROW, EXTRA_POINT, ROLLERS, RISK_L, RISK_R, END_OF_GAME, UNDEFINED,
 };
