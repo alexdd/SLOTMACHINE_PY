@@ -44,7 +44,8 @@ body {
 
 html.embed,
 html.embed body {
-  overflow: auto;
+  overflow: hidden;
+  height: auto;
 }
 
 html.embed .machine-header {
@@ -58,7 +59,18 @@ html.embed .help-panel {
 html.embed .machine {
   max-width: none;
   width: 100%;
-  padding-top: 0.5rem;
+  padding: 0.5rem 1.25rem 1.25rem;
+}
+
+html.embed .machine-body {
+  grid-template-columns: 1fr 1fr;
+}
+
+html.embed .panel {
+  height: var(--panel-height);
+  min-height: var(--panel-height);
+  max-height: var(--panel-height);
+  overflow: hidden;
 }
 
 .machine {
