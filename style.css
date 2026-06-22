@@ -19,7 +19,7 @@
   --gold: var(--green);
   --accent: var(--link);
   --reel-bg: #121721;
-  --panel-height: calc(58rem + 50px);
+  --panel-height: calc(64rem + 50px);
   --ascii-height: 11rem;
   --log-height: calc(14.5rem - 30px);
   --reel-row-height: 6.25rem;
@@ -77,10 +77,14 @@ html.embed .machine-body {
 }
 
 html.embed .panel {
-  height: var(--panel-height);
+  height: auto;
   min-height: var(--panel-height);
-  max-height: var(--panel-height);
-  overflow: hidden;
+  max-height: none;
+  overflow: visible;
+}
+
+html.embed .panel-controls {
+  overflow: visible;
 }
 
 .machine {
@@ -332,8 +336,11 @@ html.embed .help-toggle--embed {
 .panel-controls {
   padding-top: 0.5rem;
   border-top: 1px solid var(--panel-border);
-  flex-shrink: 0;
-  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .hint-compact {
